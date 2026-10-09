@@ -70,19 +70,28 @@ class Run:
             started = True; used += n
         return self
 
-# ------------------------------------------------------------------- UBER8
-print("== UBER8.COM (8-byte class) ==")
-r = Run("UBER8.COM").run(instructions=6000)
-check(len(r.com) <= 8, f"fits the 8-byte class ({len(r.com)} bytes)")
-check(len(r.com) <= 5, "and has not grown past its 5-byte budget")
+# ------------------------------------------------------------------- UBER10
+from unicorn import UC_HOOK_CODE
+print("== UBER10.COM (16-byte class) ==")
+r = Run("UBER10.COM")
+check(len(r.com) <= 16, f"fits the 16-byte class ({len(r.com)} bytes)")
+check(len(r.com) <= 10, "and has not grown past its 10-byte budget")
+check(r.com[0] == 0xF4, "starts with HLT (sleep until the next timer tick)")
+r.uc.mem_write(LIN + 0x100, b"\x90")                     # emulate the timer tick: HLT -> NOP, counted below
+ticks = []
+r.uc.hook_add(UC_HOOK_CODE, lambda uc, addr, size, ud: ticks.append(len(r.chars)), None, LIN + 0x100, LIN + 0x100)
+r.run(instructions=20000)
 check(not r.modes, "sets no video mode: it relies on DOS's default 80x25 text mode")
-check(len(r.chars) > 1500, f"prints a stream of characters through INT 29h ({len(r.chars)} in 6000 instructions)")
+check(len(ticks) > 100, f"waits for a tick before every burst ({len(ticks)} ticks)")
+bursts = [b - a for a, b in zip(ticks, ticks[1:])]
+check(set(bursts) == {8}, f"prints exactly 8 characters per tick (bursts {sorted(set(bursts))})")
 check(r.chars[0] == 0 and all((b - a) % 256 == 1 for a, b in zip(r.chars, r.chars[1:])),
       "starts at code 0 (AX = 0 at entry) and counts up by one, wrapping at 256")
 check(set(r.chars[:256]) == set(range(256)), "the first 256 characters are all 256 distinct codes")
 check(7 in r.chars[:256], "includes BEL (07h): it beeps")
+rate = 8 * 18.2
+check(100 < rate < 200, f"at the 18.2 Hz timer that is {rate:.0f} characters a second: scrolls, and readable")
 check(not r.unmapped, "touches no memory outside the program segment")
-
 
 print("\nRESULT:", "ALL PASS" if not fails else f"{len(fails)} FAILED:\n  - " + "\n  - ".join(fails))
 sys.exit(1 if fails else 0)

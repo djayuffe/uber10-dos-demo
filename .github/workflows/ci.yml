@@ -15,7 +15,7 @@ jobs:
         run: tests/run_tests.sh
       - uses: actions/upload-artifact@v4
         with:
-          name: uber8-com
+          name: uber10-com
           path: |
-            UBER8.COM
+            UBER10.COM
             SHA256SUMS

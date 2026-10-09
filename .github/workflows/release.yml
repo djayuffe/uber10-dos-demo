@@ -1,5 +1,5 @@
 name: Release
-# Push a tag like v1.0.0 to build, test and publish UBER8.COM.
+# Push a tag like v1.0.0 to build, test and publish UBER10.COM.
 on:
   push:
     tags: ["v*"]
@@ -17,5 +17,5 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           notes=$(awk -v t="${GITHUB_REF_NAME#v}" '$0 ~ "^## \\[" t "\\]" {p=1; next} /^## \[/ {p=0} p' CHANGELOG.md)
-          gh release create "$GITHUB_REF_NAME" UBER8.COM SHA256SUMS screenshot.jpg \
-            --title "UBER8 $GITHUB_REF_NAME" --notes "${notes:-See CHANGELOG.md}"
+          gh release create "$GITHUB_REF_NAME" UBER10.COM SHA256SUMS screenshot.jpg \
+            --title "UBER10 $GITHUB_REF_NAME" --notes "${notes:-See CHANGELOG.md}"
