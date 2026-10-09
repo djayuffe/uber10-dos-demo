@@ -1,0 +1,21 @@
+name: CI
+on:
+  push:
+    branches: [master]
+  pull_request:
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update && sudo apt-get install -y nasm
+      - name: Build (enforces the size gates)
+        run: ./build.sh
+      - name: Behavioural test (emulated 16-bit CPU)
+        run: tests/run_tests.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: uber8-com
+          path: |
+            UBER8.COM
+            SHA256SUMS
