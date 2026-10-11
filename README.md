@@ -6,6 +6,10 @@
 
 ![UBER10.COM running in DOSBox](screenshot.jpg)
 
+![UBER10 in motion](docs/uber10.gif)
+
+*Rendered frame by frame from the real binary running in an emulated CPU (Unicorn), with a model of the display hardware: no screen recording. Checked against real DOSBox screenshots.*
+
 Ten bytes. No setup, no assets, no libraries: it prints the 256 character codes in order, forever, eight per timer tick, so they scroll past at about two lines a second. Smileys, card suits, punctuation, digits, letters, box drawing, with CR/LF, backspace and BEL (07h, which beeps) doing their usual things.
 
 | | |
